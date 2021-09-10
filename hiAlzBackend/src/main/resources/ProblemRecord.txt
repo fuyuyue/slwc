@@ -1,0 +1,93 @@
+1.axios相关：需要controller添加@CrossOrigin来解决跨域问题
+            发送请求后返回404原因是主类没有和controller类所在的包没有在同一个包下
+2.前端设置ConfigurePlugin里的devTool：source-map才好调测
+3.前端版本是4，很多用法都和之前版本不一样了，最好用vue ui来添加router、vuex等服务
+4.Field homeService in com.slwc.controller.HomeController required a bean of type 'com.slwc.service.impl.HomeServiceImpl' that could not be found.
+  这个错误表示service类没有添加@Service注解
+
+5.文件上传：
+上传：
+    前端关键代码：
+        handleChange(file, fileList) {
+          this.fileList = fileList;
+        },
+        submitUpload() {
+          let form = new FormData();
+          form.append("userName", this.userName);
+          form.append("paperTitle", this.paperTitle);
+          this.fileList.forEach((file) => {
+            form.append("files", file.raw);
+          });
+          HomeService.upload(form).then((res) => {
+            if (res.data) {
+              alert("upload");
+            }
+          });
+        },
+    后端关键代码：（MultipartFile要和其他字段分开）
+        public boolean uploadFile(@RequestParam(value = "files") MultipartFile[] files, FileInfoVo fileInfoVo) {
+
+        }
+
+下载：
+    前端关键代码：
+       <el-table-column prop="filesName" label="附件列表">
+         <template v-slot="slotScope">
+           <div
+             v-for="(fileName, index) in slotScope.row.filesName"
+             :key="index"
+           >
+             <el-button
+               v-if="fileName"
+               type="text"
+               icon="el-icon-download"
+               @click="handleDownload(slotScope.row, fileName)"
+               >{{ fileName }}</el-button
+             >
+           </div>
+         </template>
+       </el-table-column>
+
+        handleDownload(fileInfo, fileName) {
+          const filePath = this.userName + "/" + fileInfo.title + "/" + fileName;
+          const a = document.createElement("a");
+          a.setAttribute("download", fileName);
+          a.setAttribute("target", "_blank");
+          a.setAttribute(
+            "href",
+            axios.defaults.baseURL +
+              "/download?filePath=" +
+              filePath
+          );
+          a.click();
+        },
+后端关键代码：
+    @RequestMapping("/download")
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response,
+                             @RequestParam("filePath") String filePath) {
+        fileService.download(response, filePath);
+    }
+
+    File file = new File(realPath);
+    if (file.exists()) {
+        response.setHeader("content-type", "application/octet-stream");
+        response.setContentType("application/octet-stream");
+        // 下载文件能正常显示中文
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        byte[] buffer = new byte[1024];
+        try (FileInputStream fis = new FileInputStream(file);
+             BufferedInputStream bis = new BufferedInputStream(fis)) {
+            OutputStream os = response.getOutputStream();
+            int i = bis.read(buffer);
+            while (i != -1) {
+                os.write(buffer, 0, i);
+                i = bis.read(buffer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }

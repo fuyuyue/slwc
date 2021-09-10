@@ -1,0 +1,58 @@
+{
+  "name": "helloalz",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "core-js": "^3.6.5",
+    "docxtemplater": "^3.22.3",
+    "element-plus": "^1.0.2-beta.48",
+    "element-ui": "^2.4.5",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.6.0",
+    "jszip-utils": "^0.1.0",
+    "pizzip": "^3.0.6",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^3.6.2",
+    "xlsx": "^0.17.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "^4.5.13",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "axios": "^0.21.1",
+    "babel-eslint": "^10.1.0",
+    "element-ui": "^2.15.2",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "sass-loader": "^12.1.0",
+    "vue-cli-plugin-element": "~1.0.1",
+    "vue-router": "^3.5.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
