@@ -3,9 +3,11 @@
     v-model="searchText"
     size="mini"
     style="width: 300px; float: right; margin: 0 0 10px 0"
-    placeholder="请输入 标题 | 作者 | 期刊名 搜索"
-    suffix-icon="el-icon-search"
+    placeholder="请输入 上传者 | 标题 | 作者 | 期刊名 搜索"
+    prefix-icon="el-icon-search"
     @input="handleInput"
+    clearable
+    @clear="handleInput"
   >
   </el-input>
   <el-table
@@ -58,10 +60,12 @@
   </el-table>
   <el-pagination
     background
+    @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
-    v-model="currentPage3"
+    :current-page="currentPage"
     :page-size="pageSize"
-    layout="prev, pager, next, jumper"
+    :page-sizes="[5, 10, 20, 50]"
+    layout="total, sizes, prev, pager, next, jumper"
     :total="totalNum"
   >
   </el-pagination>
@@ -83,20 +87,27 @@ export default {
       publisherFilter: [],
       publishTimeFilter: [],
       totalNum: 1000,
-      pageSize: 20,
+      pageSize: 10,
+      currentPage: 1,
     };
   },
   methods: {
-    initPaperList(pageIndex) {
+    getPaperListByCondition(val) {
+      let curPage = val ? val : this.currentPage;
       let data = {
-        pageIndex: pageIndex,
+        pageIndex: curPage,
+        pageSize: this.pageSize,
         searchContent: this.searchText,
-      }
+      };
       HomeService.getAllStudentsPaperListByCondition(data).then((res) => {
         if (res && res.data) {
-          let publisherSet = new Set();
-          let publishTimeSet = new Set();
-          this.paperInfoList = res.data.map((data) => {
+          this.totalNum = res.data.totalNum;
+          let publisherSet = new Set(this.publisherFilter.map((f) => f.value));
+          let publishTimeSet = new Set(
+            this.publishTimeFilter.map((f) => f.value)
+          );
+          this.paperInfoList = res.data.data.map((data) => {
+            data.publisher = data.userName;
             data.filesName = [];
             if (!data.filesPath) {
               data.filesName.push("暂无附件");
@@ -114,22 +125,23 @@ export default {
                 text: data.publisher,
                 value: data.publisher,
               });
+              publisherSet.add(data.publisher);
             }
-            publisherSet.add(data.publisher);
             if (!publishTimeSet.has(data.publishTime)) {
               this.publishTimeFilter.push({
                 text: data.publishTime,
                 value: data.publishTime,
               });
+              publishTimeSet.add(data.publishTime);
             }
-            publishTimeSet.add(data.publishTime);
             return data;
           });
         }
       });
     },
     handleDownload(fileInfo, fileName) {
-      const filePath = this.userName + "/" + fileInfo.title + "/" + fileName;
+      const filePath =
+        fileInfo.publisher + "/" + fileInfo.title + "/" + fileName;
       const a = document.createElement("a");
       a.setAttribute("download", fileName);
       a.setAttribute("target", "_blank");
@@ -146,8 +158,15 @@ export default {
       const property = column["property"];
       return row[property] === value;
     },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getPaperListByCondition(1);
+    },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      this.getPaperListByCondition(val);
+    },
+    searchTable() {
+      this.getPaperListByCondition();
     },
   },
   mounted() {
@@ -156,7 +175,7 @@ export default {
       localStorage.getItem("slwcUserInfo");
     this.userName = JSON.parse(userInfo).userName;
     this.role = JSON.parse(userInfo).role;
-    this.initPaperList();
+    this.getPaperListByCondition();
   },
 };
 </script>

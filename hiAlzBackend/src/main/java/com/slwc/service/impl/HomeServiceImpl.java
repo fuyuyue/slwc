@@ -5,6 +5,7 @@ import com.slwc.dao.PaperMapper;
 import com.slwc.dao.UserInfoMapper;
 import com.slwc.entity.PaperEntity;
 import com.slwc.service.HomeService;
+import com.slwc.vo.PageInfoVo;
 import com.slwc.vo.PaperVo;
 import com.slwc.vo.UserInfoVo;
 import org.springframework.aop.framework.AopContext;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HomeServiceImpl implements HomeService {
@@ -75,6 +77,27 @@ public class HomeServiceImpl implements HomeService {
             paperVos.add(paperVo);
         });
         return paperVos;
+    }
+
+    public PageInfoVo<PaperVo> getAllStudentsPaperInfo(int pageIndex, int pageSize, String searchContent) {
+        PageInfoVo<PaperVo> pageInfoVo = new PageInfoVo<>();
+        List<PaperVo> papers = paperMapper.getAllStudentsPaperInfo();
+        if (!searchContent.isEmpty()) {
+            papers = papers.stream().filter(paper -> (
+                    paper.getTitle().contains(searchContent)
+                    || paper.getAuthor().contains(searchContent)
+                    || paper.getJournalTitle().contains(searchContent)
+                    || paper.getUserName().contains(searchContent)
+            )).collect(Collectors.toList());
+        }
+        pageInfoVo.setTotalNum(papers.size());
+        int begin = (pageIndex - 1) * pageSize;
+        if (begin >= papers.size()) {
+            begin = 0;
+        }
+        int end = Math.min(begin + pageSize, papers.size());
+        pageInfoVo.setData(papers.subList(begin, end));
+        return pageInfoVo;
     }
 
     @Override

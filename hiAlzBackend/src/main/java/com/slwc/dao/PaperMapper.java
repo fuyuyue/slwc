@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface PaperMapper {
+    List<PaperVo> getAllStudentsPaperInfo();
+
     List<PaperEntity> getPaperInfoList(String userName);
 
     PaperVo getPaperInfo(String title);

@@ -49,8 +49,10 @@
             size="mini"
             style="width: 300px; float: right"
             placeholder="请输入 标题 | 作者 | 期刊名 搜索"
-            suffix-icon="el-icon-search"
+            prefix-icon="el-icon-search"
             @input="handleInput"
+            clearable
+            @clear="handleInput"
           >
           </el-input>
           <excel-table

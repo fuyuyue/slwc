@@ -1,6 +1,7 @@
 package com.slwc.controller;
 
 import com.slwc.service.impl.HomeServiceImpl;
+import com.slwc.vo.PageInfoVo;
 import com.slwc.vo.PaperVo;
 import com.slwc.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,9 @@ public class HomeController {
     }
 
     @GetMapping("/userHome/get-all-student-paper-list")
-    public List<PaperVo> getAllStudentsPaperList(@RequestParam(value = "pageIndex") int pageIndex,
-                                                 @RequestParam(value = "searchContent") String searchContent) {
-
+    public PageInfoVo<PaperVo> getAllStudentsPaperList(@RequestParam(value = "pageIndex") int pageIndex,
+                                                       @RequestParam(value = "pageSize") int pageSize,
+                                                       @RequestParam(value = "searchContent") String searchContent) {
+        return homeService.getAllStudentsPaperInfo(pageIndex, pageSize, searchContent);
     }
 }

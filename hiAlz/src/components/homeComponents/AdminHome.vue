@@ -12,6 +12,17 @@
       >
         <el-menu-item index="1">处理中心</el-menu-item>
         <el-menu-item index="2">消息中心</el-menu-item>
+        <el-submenu index="3">
+          <template v-slot:title>
+            <i class="el-icon-setting"></i>
+            <span>欢迎您，{{ userName }}</span>
+          </template>
+          <el-menu-item index="3-1"
+            ><el-button type="text" @click="showExitDialog"
+              >退出登录</el-button
+            ></el-menu-item
+          >
+        </el-submenu>
       </el-menu>
     </el-header>
     <el-main>
@@ -55,6 +66,18 @@
       <div v-show="activeIndex === '2'">
         <infinity-scroll></infinity-scroll>
       </div>
+      <el-dialog
+        title="提示"
+        v-model="dialogVisible"
+        width="30%"
+        :before-close="handleClose"
+      >
+        <span>是否确认退出登录？</span>
+        <template v-slot:footer class="dialog-footer">
+          <el-button @click="cancelExit">取 消</el-button>
+          <el-button type="primary" @click="comfirmExit">确 定</el-button>
+        </template>
+      </el-dialog>
     </el-main>
   </el-container>
 </template>
@@ -69,9 +92,36 @@ export default {
     return {
       needApprovedList: [],
       activeIndex: "1",
+      userName: "",
+      role: "",
+      dialogVisible: false,
     };
   },
   methods: {
+    showExitDialog() {
+      this.dialogVisible = true;
+    },
+    handleClose() {
+      this.dialogVisible = false;
+      this.activeIndex = "1";
+    },
+    comfirmExit() {
+      this.dialogVisible = false;
+      this.clearUserState();
+    },
+    cancelExit() {
+      this.dialogVisible = false;
+      this.activeIndex = "1";
+    },
+    clearUserState() {
+      if (sessionStorage.getItem("slwcUserInfo")) {
+        sessionStorage.removeItem("slwcUserInfo");
+      }
+      if (localStorage.getItem("slwcUserInfo")) {
+        localStorage.removeItem("slwcUserInfo");
+      }
+      this.$router.push("/login");
+    },
     handleSelect(key) {
       this.activeIndex = key;
     },
@@ -117,6 +167,11 @@ export default {
     },
   },
   mounted() {
+    let userInfo =
+      sessionStorage.getItem("slwcUserInfo") ||
+      localStorage.getItem("slwcUserInfo");
+    this.userName = JSON.parse(userInfo).userName;
+    this.role = JSON.parse(userInfo).role;
     HomeService.getRegisterList().then((res) => {
       if (res && res.data) {
         this.needApprovedList = res.data.filter((data) => {
@@ -127,3 +182,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.el-menu--horizontal .el-submenu {
+  float: right;
+}
+.formClass {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10%;
+}
+</style>

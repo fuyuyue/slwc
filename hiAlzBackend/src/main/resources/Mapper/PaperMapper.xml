@@ -39,4 +39,16 @@
     <delete id="deletePaperInfo" parameterType="java.lang.String">
         delete from helloAlz.paper where title=#{0}
     </delete>
+
+    <select id="getAllStudentsPaperInfo" resultType="com.slwc.vo.PaperVo">
+        SELECT title, author, journal_title as journalTitle, journal_no as journalNo, publish_time as publishTime,
+        pu.user_name as userName, page_no as pageNo, file_path as filesPath
+        FROM
+        (select * from helloAlz.paper p where p.user_name in
+        (select user_name from helloAlz.userinfo u
+        where u.role='学生')) as pu
+        left join
+        helloAlz.fileInfo f
+        on f.user_name=pu.user_name and f.paper_title=pu.title
+    </select>
 </mapper>
