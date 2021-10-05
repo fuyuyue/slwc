@@ -12,8 +12,16 @@ function deleteById(id) {
   return axios.post("/home/delete", id);
 }
 
+function setRoleManager(id) {
+  return axios.post("/set-role-manager", id);
+}
+
 function getPaperList(userName) {
   return axios.get("/home/userHome/get-paper-list", { params: { userName } });
+}
+
+function getSeminarList(userName) {
+  return axios.get("/home/userHome/get-seminar-list", { params: { userName } });
 }
 
 function modifyPaperInfo(data, hasFiles) {
@@ -52,4 +60,6 @@ export default {
   deletePaperInfo,
   updatePwd,
   getAllStudentsPaperListByCondition,
+  getSeminarList,
+  setRoleManager,
 };

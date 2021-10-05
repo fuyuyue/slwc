@@ -49,6 +49,14 @@
         update helloAlz.userinfo set status="Approved" where id=#{id}
     </update>
 
+    <update id="setRoleManager" parameterType="java.lang.String">
+        update helloAlz.userinfo set role_manager="Y" where id=#{id}
+    </update>
+
+    <update id="setNotRoleManager">
+        update helloAlz.userinfo set role_manager="N" where role_manager="Y" and id!=1;
+    </update>
+
     <delete id="deleteById" parameterType="java.lang.String">
         delete from helloAlz.userinfo where id=#{id}
     </delete>

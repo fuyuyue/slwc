@@ -17,7 +17,7 @@
     <select id="getPaperInfoList" resultType="com.slwc.entity.PaperEntity" parameterType="java.lang.String">
         SELECT title, author, journal_title as journalTitle, journal_no as journalNo, publish_time as publishTime,
         user_name as userName, page_no as pageNo
-        FROM helloAlz.paper where user_name = #{0};
+        FROM helloAlz.paper where title not like 'SEMINAR_%' and user_name = #{0};
     </select>
 
     <select id="getPaperInfo" resultType="com.slwc.vo.PaperVo">
@@ -44,11 +44,21 @@
         SELECT title, author, journal_title as journalTitle, journal_no as journalNo, publish_time as publishTime,
         pu.user_name as userName, page_no as pageNo, file_path as filesPath
         FROM
-        (select * from helloAlz.paper p where p.user_name in
+        (select * from helloAlz.paper p where p.title not like 'SEMINAR_%' and p.user_name in
         (select user_name from helloAlz.userinfo u
         where u.role='学生')) as pu
         left join
         helloAlz.fileInfo f
         on f.user_name=pu.user_name and f.paper_title=pu.title
+    </select>
+
+    <select id="getSeminarByUserName" resultType="com.slwc.entity.PaperEntity">
+        SELECT title, publish_time as publishTime, user_name as userName
+        FROM helloAlz.paper where user_name=#{0} and title like 'SEMINAR_%';
+    </select>
+
+    <select id="getAllSeminar" resultType="com.slwc.entity.PaperEntity">
+        SELECT title, publish_time as publishTime, user_name as userName
+        FROM helloAlz.paper where title like 'SEMINAR_%';
     </select>
 </mapper>

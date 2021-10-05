@@ -93,6 +93,9 @@ export default {
   },
   methods: {
     getPaperListByCondition(val) {
+      if (this.role === '学生') {
+        return;
+      }
       let curPage = val ? val : this.currentPage;
       let data = {
         pageIndex: curPage,

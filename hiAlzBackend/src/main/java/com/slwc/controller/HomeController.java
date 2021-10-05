@@ -37,6 +37,11 @@ public class HomeController {
         return homeService.getPaperInfoList(userName);
     }
 
+    @GetMapping("/userHome/get-seminar-list")
+    public List<PaperVo> getSeminarList(@RequestParam("userName") String userName) {
+        return homeService.getSeminarList(userName);
+    }
+
     @GetMapping("/userHome/get-paper")
     public PaperVo getPaperInfo(String title) {
         return homeService.getPaperInfo(title);

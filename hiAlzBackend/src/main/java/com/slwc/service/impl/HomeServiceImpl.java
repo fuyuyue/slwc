@@ -4,6 +4,7 @@ import com.slwc.dao.FileInfoMapper;
 import com.slwc.dao.PaperMapper;
 import com.slwc.dao.UserInfoMapper;
 import com.slwc.entity.PaperEntity;
+import com.slwc.entity.UserInfoEntity;
 import com.slwc.service.HomeService;
 import com.slwc.vo.PageInfoVo;
 import com.slwc.vo.PaperVo;
@@ -74,6 +75,27 @@ public class HomeServiceImpl implements HomeService {
             paperVo.setJournalNo(entity.getJournalNo());
             paperVo.setPageNo(entity.getPageNo());
             paperVo.setFilesPath(filePath);
+            paperVos.add(paperVo);
+        });
+        return paperVos;
+    }
+
+    public List<PaperVo> getSeminarList(String userName) {
+        List<PaperVo> paperVos = new ArrayList<>();
+        UserInfoEntity userInfo = userInfoMapper.getUserByName(userName);
+        List<PaperEntity> entities;
+        if ("教师".equals(userInfo.getRole())) {
+            entities = paperMapper.getAllSeminar();
+        } else {
+            entities = paperMapper.getSeminarByUserName(userName);
+        }
+        entities.forEach(entity -> {
+            String filePath = fileInfoMapper.getFilePath(entity.getUserName(), entity.getTitle());
+            PaperVo paperVo = new PaperVo();
+            paperVo.setTitle(entity.getTitle());
+            paperVo.setPublishTime(entity.getPublishTime());
+            paperVo.setFilesPath(filePath);
+            paperVo.setPublisher(entity.getUserName());
             paperVos.add(paperVo);
         });
         return paperVos;

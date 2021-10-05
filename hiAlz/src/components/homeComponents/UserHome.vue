@@ -10,9 +10,11 @@
         text-color="#fff"
         active-text-color="#ffd04b"
       >
-        <el-menu-item index="1">处理中心</el-menu-item>
-        <el-menu-item index="2" v-if="role==='教师'">组会文件上传</el-menu-item>
-        <el-menu-item index="3" v-if="role==='教师'">学生论文信息</el-menu-item>
+        <el-menu-item index="1">个人中心</el-menu-item>
+        <el-menu-item index="2">组会信息</el-menu-item>
+        <el-menu-item index="3" v-if="role === '教师'"
+          >学生论文信息</el-menu-item
+        >
         <el-submenu index="4">
           <template v-slot:title>
             <i class="el-icon-setting"></i>
@@ -37,10 +39,14 @@
             type="success"
             @click="handleExportTableAsExcel"
             size="mini"
-            v-if="role==='教师'"
+            v-if="role === '教师'"
             >导出为Excel</el-button
           >
-          <el-button type="primary" @click="handleExportTableAsWord" size="mini" v-if="role==='教师'"
+          <el-button
+            type="primary"
+            @click="handleExportTableAsWord"
+            size="mini"
+            v-if="role === '教师'"
             >导出为Word</el-button
           >
           <export-as-word v-show="false" ref="exportAsWord"></export-as-word>
@@ -148,47 +154,15 @@
         </div>
       </div>
       <div v-show="activeIndex === '2'">
-        <el-input v-model="userName">用户名</el-input>
-        <el-input v-model="paperTitle">文章标题</el-input>
-        <upload-component @filesChange="filesChange"></upload-component>
-        <el-button
-          style="margin-left: 10px;"
-          size="small"
-          type="success"
-          @click="submitUpload"
-          >上传到服务器</el-button
-        >
+        <div>
+          <seminar :role="role"></seminar>
+        </div>
       </div>
       <div v-show="activeIndex === '3'">
         <all-students-paper-info></all-students-paper-info>
       </div>
       <div v-show="activeIndex === '4-1'" class="formClass">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-          <el-form-item prop="pwd">
-            <el-input
-              type="password"
-              v-model="ruleForm.pwd"
-              autocomplete="off"
-              clearable
-              placeholder="请输入新密码"
-            ></el-input>
-          </el-form-item>
-          <el-form-item prop="confirmPwd">
-            <el-input
-              type="password"
-              v-model="ruleForm.confirmPwd"
-              autocomplete="off"
-              clearable
-              placeholder="请再次输入新密码"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="submitNewPwd('ruleForm')"
-              >确认</el-button
-            >
-            <el-button @click="resetForm('ruleForm')">重置</el-button>
-          </el-form-item>
-        </el-form>
+        <reset-pwd :userName="userName"></reset-pwd>
       </div>
       <el-dialog
         title="提示"
@@ -209,31 +183,24 @@
 <script>
 import HomeService from "../../service/HomeService";
 import AddOrUpdatePaper from "../commonComponents/AddOrUpdatePaper.vue";
-import UploadComponent from "../commonComponents/UploadComponent.vue";
 import ExcelTable from "../commonComponents/ExcelTable.vue";
 import axios from "axios";
 import CommonFunc from "../../service/CommonFunc";
 import ExportAsWord from "../commonComponents/ExportAsWord.vue";
-import AllStudentsPaperInfo from './AllStudentsPaperInfo';
+import AllStudentsPaperInfo from "./AllStudentsPaperInfo.vue";
+import Seminar from "./Seminar.vue";
+import ResetPwd from "../commonComponents/ResetPwd.vue";
 
 export default {
   components: {
     AddOrUpdatePaper,
-    UploadComponent,
     ExcelTable,
     ExportAsWord,
     AllStudentsPaperInfo,
+    Seminar,
+    ResetPwd,
   },
   data() {
-    var confirmPassword = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请再次输入密码"));
-      } else if (value !== this.ruleForm.pwd) {
-        callback(new Error("两次输入密码不一致!"));
-      } else {
-        callback();
-      }
-    };
     return {
       debounceFunc: CommonFunc.debounce(this.searchTable, 600),
       dialogVisible: false,
@@ -246,26 +213,7 @@ export default {
       showPapersList: true,
       isEdit: false,
       formData: {},
-      paperTitle: "testTitle",
       fileList: [],
-      ruleForm: {
-        pwd: "",
-        confirmPwd: "",
-      },
-      rules: {
-        pwd: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          {
-            min: 8,
-            max: 20,
-            message: "长度在 8 到 20 个字符",
-          },
-        ],
-        confirmPwd: [
-          { required: true, message: "请再次输入密码", trigger: "blur" },
-          { validator: confirmPassword, trigger: "blur" },
-        ],
-      },
     };
   },
   methods: {
@@ -278,11 +226,11 @@ export default {
     },
     cancelExit() {
       this.dialogVisible = false;
-      this.activeIndex = '1';
+      this.activeIndex = "1";
     },
     handleClose() {
       this.dialogVisible = false;
-      this.activeIndex = '1';
+      this.activeIndex = "1";
     },
     filesChange(fileList) {
       this.fileList = fileList;
@@ -390,40 +338,6 @@ export default {
               this.showPaperInfoList = this.paperInfoList.map((paper) => paper);
             } else {
               this.$message.error("删除失败！");
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-    submitNewPwd(ruleFormName) {
-      this.$confirm("重置密码后需要重新登录, 是否继续?", "提示", {
-        cancelButtonText: "取消",
-        confirmButtonText: "确定",
-        type: "warning",
-      })
-        .then(() => {
-          this.$refs[ruleFormName].validate((valid) => {
-            if (valid) {
-              let data = {
-                pwd: this.ruleForm.pwd,
-                userName: this.userName,
-              };
-              HomeService.updatePwd(data).then((res) => {
-                if (res) {
-                  this.$message({
-                    type: "success",
-                    message: "重置密码成功，请重新登录!",
-                  });
-                  this.clearUserState();
-                } else {
-                  this.$message.error("重置密码失败！请重试");
-                }
-              });
             }
           });
         })

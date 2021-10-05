@@ -23,4 +23,8 @@ public interface UserInfoMapper {
     void deleteById(String id);
 
     void updatePwd(String newPwd, String userName);
+
+    void setRoleManager(String id);
+
+    void setNotRoleManager();
 }

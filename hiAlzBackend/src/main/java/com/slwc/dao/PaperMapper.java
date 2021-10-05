@@ -19,4 +19,8 @@ public interface PaperMapper {
     void updatePaperInfo(PaperVo paperVo);
 
     void deletePaperInfo(String title);
+
+    List<PaperEntity> getSeminarByUserName(String userName);
+
+    List<PaperEntity> getAllSeminar();
 }
