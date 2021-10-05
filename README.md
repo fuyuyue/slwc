@@ -33,3 +33,14 @@ CREATE TABLE `fileInfo` (
   `file_path` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`user_name`,`paper_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `stock` (
+  `goods_name` varchar(50) NOT NULL,
+  `goods_brand` varchar(40) DEFAULT NULL,
+  `spec` varchar(50) DEFAULT NULL,
+  `num` int(11) DEFAULT NULL,
+  `unit` varchar(10) DEFAULT NULL,
+  `store_place` varchar(50) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`goods_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
