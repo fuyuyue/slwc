@@ -44,3 +44,13 @@ CREATE TABLE `stock` (
   `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`goods_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `helloAlz`.`stockapply` (
+  `goods_name` VARCHAR(50) NULL,
+  `draw_num` INT NULL,
+  `return_num` INT NULL,
+  `user_name` VARCHAR(45) NULL,
+  `apply_time` DATE NULL,
+  `approved` VARCHAR(2) NULL,
+  `id` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`id`));
